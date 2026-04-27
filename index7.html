@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>健康迷宮遊戲</title>
+<style>
+body {
+    font-family: Arial;
+    text-align: center;
+}
+#maze {
+    display: grid;
+    grid-template-columns: repeat(7, 50px);
+    gap: 2px;
+    margin: 20px auto;
+}
+.cell {
+    width: 50px;
+    height: 50px;
+}
+.wall { background: #333; }
+.path { background: #eee; }
+.player { background: #4CAF50; }
+.goal { background: gold; }
+#info { margin-top: 10px; }
+</style>
+</head>
+<body>
+
+<h2>健康知識迷宮 🧠</h2>
+<p>用方向鍵移動，答對題目才能前進！撞牆會扣血 ❤️</p>
+
+<div id="maze"></div>
+<div id="info">生命值：❤️❤️❤️</div>
+
+<script>
+const mazeData = [
+[1,1,1,1,1,1,1],
+[1,0,0,0,1,0,1],
+[1,0,1,0,1,0,1],
+[1,0,1,0,0,0,1],
+[1,0,1,1,1,0,1],
+[1,0,0,0,1,0,1],
+[1,1,1,1,1,1,1],
+];
+
+let player = {x:1, y:1};
+let goal = {x:5, y:5};
+let life = 3;
+
+const questions = [
+{
+q:"每天建議喝多少水？",
+a:"2000"
+},
+{
+q:"一週建議運動幾天？",
+a:"3"
+},
+{
+q:"BMI過重標準是多少以上？",
+a:"24"
+}
+];
+
+function renderMaze() {
+const maze = document.getElementById("maze");
+maze.innerHTML = "";
+
+mazeData.forEach((row,y)=>{
+row.forEach((cell,x)=>{
+const div = document.createElement("div");
+div.classList.add("cell");
+
+if(cell === 1) div.classList.add("wall");
+else div.classList.add("path");
+
+if(x===player.x && y===player.y)
+div.classList.add("player");
+
+if(x===goal.x && y===goal.y)
+div.classList.add("goal");
+
+maze.appendChild(div);
+});
+});
+}
+
+function updateLife() {
+document.getElementById("info").innerText =
+"生命值：" + "❤️".repeat(life);
+}
+
+function askQuestion() {
+const q = questions[Math.floor(Math.random()*questions.length)];
+const answer = prompt(q.q);
+
+return answer === q.a;
+}
+
+document.addEventListener("keydown", e=>{
+let newX = player.x;
+let newY = player.y;
+
+if(e.key==="ArrowUp") newY--;
+if(e.key==="ArrowDown") newY++;
+if(e.key==="ArrowLeft") newX--;
+if(e.key==="ArrowRight") newX++;
+
+if(mazeData[newY][newX] === 1) {
+life--;
+alert("撞到牆了！");
+updateLife();
+
+if(life<=0){
+alert("遊戲結束 💀");
+location.reload();
+}
+return;
+}
+
+// 問問題
+if(!askQuestion()){
+alert("答錯了！不能前進");
+return;
+}
+
+player.x = newX;
+player.y = newY;
+
+if(player.x===goal.x && player.y===goal.y){
+alert("恭喜找到寶箱 🎁！");
+location.reload();
+}
+
+renderMaze();
+});
+
+renderMaze();
+updateLife();
+</script>
+
+</body>
+</h
